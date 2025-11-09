@@ -1,26 +1,27 @@
 import chromadb
-from chromadb.config import Settings
 from sentence_transformers import SentenceTransformer
+
+import config
 
 class VectorDB(object):
 
     _instance = None
 
     # 类方法，单例模式，保证模型可以复用。
-    def __new__(cls, model_path: str):
+    def __new__(cls):
         if not cls._instance:
             cls._instance = super().__new__(cls)
 
             """ 初始化向量数据库 """
-            cls._instance.client = chromadb.PersistentClient(path="./chroma_data")
+            cls._instance.client = chromadb.PersistentClient(path=config.chroma_data_path)
             cls._instance.collection = cls._instance.client.get_or_create_collection(
                 name="server_logs",
                 metadata={"hnsw:space": "cosine"}
             )
 
             """ 初始化embedding模型 """
-            cls.embed_model = SentenceTransformer(model_path)
-
+            # 读取配置文件
+            cls._instance.embed_model = SentenceTransformer(config.embed_model_path)
         return cls._instance
 
 
