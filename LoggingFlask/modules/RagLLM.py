@@ -2,6 +2,8 @@ from typing import Optional, Any
 
 from openai import OpenAI
 
+import config
+
 
 class RagLLM(object):
     _instance = None
@@ -9,8 +11,9 @@ class RagLLM(object):
     def __new__(cls):
         if not cls._instance:
             cls._instance = super().__new__(cls)
-            cls._instance.client = OpenAI(base_url="http://localhost:11434/v1/",
-                             api_key="qwen2:72b")
+            # 11434: Ollama本地Http进程端口
+            cls._instance.client = OpenAI(base_url=config.base_url,
+                             api_key=config.model_name)
         return cls._instance
 
     def __call__(self, prompt: str, **kwargs: Any):

@@ -15,7 +15,10 @@ def ingest_logs():
     log_preprocessor = LogPreprocessing.LogPreprocessing()
     vector_db = VectorDB.VectorDB()
 
+    # 1. 日志文件预处理
     log_blocks = log_preprocessor.process_log_file(file_path)
+
+    # 2. 将日志块存储入向量数据库。
     vector_db.store_log_blocks(log_blocks)
     return jsonify({
         'status': 'success',

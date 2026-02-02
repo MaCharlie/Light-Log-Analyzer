@@ -13,7 +13,7 @@ class VectorDB(object):
             cls._instance = super().__new__(cls)
 
             """ 初始化向量数据库 """
-            cls._instance.client = chromadb.PersistentClient(path=config.chroma_data_path)
+            cls._instance.client = chromadb.PersistentClient(path=config.chroma_data_path) # 存在自动加载 不存在自动创建
             cls._instance.collection = cls._instance.client.get_or_create_collection(
                 name="server_logs",
                 metadata={"hnsw:space": "cosine"}
@@ -21,13 +21,14 @@ class VectorDB(object):
 
             """ 初始化embedding模型 """
             # 读取配置文件
-            cls._instance.embed_model = SentenceTransformer(config.embed_model_path)
+            cls._instance.embed_model = SentenceTransformer(config.embed_model_name)
         return cls._instance
 
 
-    """ 将预处理后的日志块存入向量数据库 """
+
     @classmethod
     def store_log_blocks(cls, log_blocks: list):
+        """ 将预处理后的日志块存入向量数据库 """
         # 分别存储log_id, 文档, 元数据
         ids, documents, metadatas = [], [], []
 
@@ -54,14 +55,15 @@ class VectorDB(object):
             metadatas=metadatas
         )
 
-    """
-    混合检索日志
-    :param query: 自然语言查询
-    :param filters: 元数据过滤
-    :param top_k: 返回结果数量
-    """
+
     @classmethod
     def search_logs(cls, query: str, filters: dict = None, top_k: int = 5):
+        """
+        混合检索日志
+        :param query: 自然语言查询--关键字
+        :param filters: 元数据过滤
+        :param top_k: 返回结果数量
+        """
         # 1. 生成查询向量, 用于模糊查询
         query_embedding = cls._instance.embed_model.encode([query]).tolist()[0]
 

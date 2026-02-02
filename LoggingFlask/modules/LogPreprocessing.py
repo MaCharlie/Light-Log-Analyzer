@@ -5,8 +5,13 @@ class LogPreprocessing(object):
     def __init__(self):
         super().__init__()
 
-    """ 将日志行按requestId进行分组 """
+
     def parse_logs(self, file_path: str):
+        """
+        将日志行按requestId进行分组
+        :param file_path:
+        :return:
+        """
         # 按requestId分组存储日志行
         log_blocks = defaultdict(list)
 
@@ -30,8 +35,11 @@ class LogPreprocessing(object):
         # 返回一个dict, key为requestId, value为分组后的日志行
         return log_blocks
 
-    """ 单行日志提取元数据 """
+
     def clean_and_extract_metadata(self, log_line: str):
+        """
+        单行日志提取元数据
+        """
         # 根据该模式进行解码
         pattern = re.compile(
             r'\[(?P<timestamp>.+?)\] '
@@ -55,8 +63,12 @@ class LogPreprocessing(object):
             "service": log_data["service"]
         }
 
-    """ 对每个reqId对应的所有日志, 组装日志块, 生成用于embedding的文本. """
+
     def build_log_block(self, request_id: str, log_lines: list):
+        """
+        对每个reqId对应的所有日志, 组装日志块, 生成用于embedding的文本.
+        """
+
         # List<Map<>>, 每个reqId对应着一个dict格式
         cleaned_logs = []
         for line in log_lines:
@@ -91,12 +103,20 @@ class LogPreprocessing(object):
             "raw_logs": [log["raw_log"] for log in cleaned_logs]
         }
 
-    """ 文件预处理流程串联 """
+
     def process_log_file(self, file_path: str):
+        """
+        文件预处理流程串联
+        :param file_path:
+        :return:
+        """
+
+        # 1. 日志行按requestId分组
         grouped_logs = self.parse_logs(file_path)
 
         blocks = []
         for req_id, log_lines in grouped_logs.items():
+            # 2. 将日志块进行分装，生成用于embedding的文本
             block = self.build_log_block(req_id, log_lines)
             if block:
                 blocks.append(block)
