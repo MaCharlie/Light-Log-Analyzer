@@ -1,0 +1,9 @@
+## 日志格式
+
+```
+[2023-10-25 14:30:12,456] [INFO] [reqId:req-123] UserService: Request received from user-456
+[2023-10-25 14:30:12,567] [DEBUG] [reqId:req-123] DB: Querying user profile...
+[2023-10-25 14:30:12,789] [ERROR] [reqId:req-123] UserService: DB timeout! Failed to get user.
+[2023-10-25 14:30:13,001] [INFO] [reqId:req-124] PaymentService: Starting payment for order-789
+```
+
